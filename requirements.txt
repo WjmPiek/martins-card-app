@@ -1,5 +1,1 @@
 Flask>=2.3
-
-Flask
-gunicorn
-Pillow
