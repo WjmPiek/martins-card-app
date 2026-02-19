@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ display_name }} | {{ org }}</title>
+
+  <style>
+    :root{
+      /* Theme */
+      --bg:#F5F6FA;                 /* soft silver background */
+      --bg2:#E5E7EB;                /* light silver */
+      --card:#FFFFFF;               /* card white */
+      --line:#E5E7EB;               /* borders */
+      --text:#2E2E2E;               /* charcoal */
+      --muted:#6B7280;              /* muted grey */
+      --primary:#C8A2C8;            /* lilac */
+      --primary2:#E9D7EE;           /* pale lilac */
+      --btn:#6A1B9A;                /* deep plum (complimentary) */
+      --btnHover:#4A148C;           /* darker plum */
+      --shadow:0 18px 45px rgba(17,24,39,0.10);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:linear-gradient(135deg,var(--bg),var(--bg2));
+      color:var(--text);
+      padding:20px;
+    }
+
+    .card{
+      width:min(460px,100%);
+      border-radius:var(--radius);
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .top{
+      padding:20px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      gap:16px;
+      align-items:center;
+      background:linear-gradient(135deg, rgba(200,162,200,0.14), rgba(229,231,235,0.65));
+    }
+
+    .branding{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      flex: 0 0 auto;
+    }
+
+    .logo{
+      width:54px;
+      height:54px;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid var(--line);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      box-shadow:0 10px 20px rgba(17,24,39,0.07);
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+
+    /* Profile photo under logo */
+    .profile-frame{
+      width:118px;
+      height:118px;
+      border-radius:50%;
+      padding:4px;
+      background:linear-gradient(135deg,var(--primary),var(--bg2));
+      box-shadow:0 12px 26px rgba(106,27,154,0.18);
+    }
+    .profile-frame img{
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      object-fit:cover;
+      border:3px solid #fff;
+    }
+
+    .headertext{flex:1; min-width:0}
+
+    .company{
+      font-size:12px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .name{
+      font-size:24px;
+      font-weight:850;
+      margin:6px 0 2px;
+      letter-spacing:-0.02em;
+      line-height:1.15;
+    }
+
+    .title{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .section{ padding:20px; }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:12px 12px;
+      margin-bottom:10px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(200,162,200,0.08), rgba(229,231,235,0.45));
+      border:1px solid var(--line);
+    }
+    .row span{color:var(--muted);font-size:13px; flex:0 0 auto;}
+    .row a{
+      color:var(--text);
+      text-decoration:none;
+      font-weight:650;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 68%;
+      text-align:right;
+    }
+
+    /* Buttons */
+    .btn{
+      display:block;
+      text-align:center;
+      padding:14px;
+      margin-top:12px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:750;
+      background:var(--btn);
+      color:#fff;
+      border:1px solid rgba(74,20,140,0.18);
+      transition:.18s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:hover{
+      background:var(--btnHover);
+      transform:translateY(-2px);
+    }
+
+    .footer{
+      padding:15px 20px 20px;
+      border-top:1px solid var(--line);
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+      background:linear-gradient(135deg, rgba(229,231,235,0.55), rgba(200,162,200,0.10));
+    }
+
+    /* Modals */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(17,24,39,0.55);
+      backdrop-filter:blur(8px);
+      z-index:999;
+      padding:20px;
+    }
+    .modal-content{
+      background:var(--card);
+      border-radius:18px;
+      max-width:860px;
+      margin:auto;
+      max-height:90vh;
+      overflow:auto;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:18px 20px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(135deg, rgba(200,162,200,0.16), rgba(229,231,235,0.70));
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .modal-header h2{margin:0;font-size:18px}
+    .modal-header button{
+      background:transparent;
+      border:0;
+      font-size:28px;
+      color:var(--text);
+      cursor:pointer;
+      line-height:1;
+    }
+    .modal-body{
+      padding:20px;
+      line-height:1.65;
+      color:var(--text);
+    }
+    .modal-body h3{
+      margin-top:20px;
+      margin-bottom:8px;
+      color:#3b3b3b;
+    }
+
+    /* Plans */
+    .plan{
+      background:linear-gradient(135deg, rgba(200,162,200,0.08), rgba(229,231,235,0.50));
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:18px;
+      margin-bottom:16px;
+    }
+    .plan h3{margin:0 0 6px;font-size:18px}
+    .price{
+      font-size:16px;
+      font-weight:850;
+      margin-bottom:10px;
+      color:var(--btn);
+    }
+    .plan ul{padding-left:18px;margin:10px 0 14px}
+    .plan li{margin-bottom:6px;color:#3b3b3b}
+
+    .plan-btn{
+      display:block;
+      text-align:center;
+      padding:12px;
+      border-radius:12px;
+      background:var(--btn);
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      transition:.18s ease;
+    }
+    .plan-btn:hover{
+      background:var(--btnHover);
+      transform:translateY(-2px);
+    }
+
+    .highlight{
+      border:2px solid var(--primary);
+      background:linear-gradient(135deg, rgba(200,162,200,0.14), rgba(233,215,238,0.30));
+    }
+
+    @media (max-width: 420px){
+      .row a{ max-width: 58%; }
+      .name{ font-size: 22px; }
+      .profile-frame{ width:110px; height:110px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+
+    <div class="top">
+      <div class="branding">
+        <div class="logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onerror="this.remove();">
+        </div>
+
+        <div class="profile-frame">
+          <img src="{{ url_for('static', filename='profile.jpg') }}" alt="Wjm" onerror="this.remove();">
+        </div>
+      </div>
+
+      <div class="headertext">
+        <div class="company">{{ org }}</div>
+        <div class="name">{{ display_name }}</div>
+        <div class="title">{{ title }}</div>
+      </div>
+    </div>
+
+    <div class="section">
+
+      <div class="row">
+        <span>WhatsApp</span>
+        <a href="https://wa.me/{{ whatsapp_e164 }}" target="_blank" rel="noopener">{{ whatsapp_display }}</a>
+      </div>
+
+      <div class="row">
+        <span>Office</span>
+        <a href="tel:+{{ office_e164 }}">{{ office_display }}</a>
+      </div>
+
+      <div class="row">
+        <span>Email</span>
+        <a href="mailto:{{ email }}?subject=Funeral%20Service%20Enquiry">{{ email }}</a>
+      </div>
+
+      <div class="row">
+        <span>Website</span>
+        <a href="{{ website_url }}" target="_blank" rel="noopener">{{ website_display }}</a>
+      </div>
+
+      <div class="row">
+        <span>Address</span>
+        <a href="https://www.google.com/maps/dir/?api=1&destination={{ maps_destination }}"
+           target="_blank" rel="noopener">{{ address_display }}</a>
+      </div>
+
+      <a class="btn" href="{{ url_for('vcard') }}">Save to Contacts</a>
+      <a class="btn" href="mailto:{{ email }}?subject=Funeral%20Service%20Enquiry">Email Us</a>
+      <a class="btn" href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20Wjm%2C%20I%20need%20assistance%20please."
+         target="_blank" rel="noopener">WhatsApp</a>
+      <a class="btn" href="https://www.google.com/maps/dir/?api=1&destination={{ maps_destination }}"
+         target="_blank" rel="noopener">Get Directions</a>
+
+      <a class="btn" onclick="openModal('cremationModal')">Cremations</a>
+      <a class="btn" onclick="openModal('coverModal')">Single Family Cover</a>
+      <a class="btn" onclick="openModal('familyModal')">Family Cover</a>
+
+    </div>
+
+    <div class="footer">
+      {{ org }} • {{ address_display }}
+    </div>
+  </div>
+
+  <!-- Cremation Modal -->
+  <div id="cremationModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="cremationTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="cremationTitle">Cremation Services</h2>
+        <button onclick="closeModal('cremationModal')" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <h3>Cremation</h3>
+        <p>Whether you choose a cremation for personal or religious reasons it can be done in various ways to include your own wishes and that of a loved one.</p>
+        <p>There are no set rules with cremations and allows you more choices than a traditional burial. It can be a simple “direct” or private cremation without anyone present or it could be elaborate with the coffin present at the church service. A direct cremation costs less than a traditional funeral.</p>
+        <p>The Cremation service can be arranged to include all your requirements and traditions such as a private viewing, a wake and a Memorial service before or after the cremation.</p>
+        <p>Your consultant will take care of all the arrangements on your behalf and guide you with professional advice to include all your wishes and special request such as the internment, scattering or burial of the cremains in a niche, grave or special place of significance.</p>
+        <p>If you are considering cremation as an option for you personally when the time comes, it is always wise to consult your family and advise them of your wishes. You could also complete and make use of our Pre-Planning option and print it to keep safe in a file with all your other important documents such as your Will. You are welcome to contact us on our Toll-Free number for additional advice.</p>
+
+        <h3>Attended Cremation</h3>
+        <p>At an attended cremation, the norm is that the loved one will be brought in a casket to the church, chapel or venue by the funeral parlour involved. The casket will be present during the sermon or memorial service.</p>
+        <p>Depending on the church, chapel or venue the family can request that the casket be opened before, during or after the sermon or memorial service for the last viewing of the loved one to take place.</p>
+        <p>After the sermon or memorial service, the loved one will be taken to the crematorium in the chosen casket for the cremation to take place. This could be immediately or as per the arrangement at a given date or time. After the cremation takes place the remains of the loved one will be handed to the family in an ash box or urn.</p>
+        <p>Utmost care is taken during the cremation process with stringent legislation in place to ensure that the family will only get the remains of their loved one. Martin’s Funeral strives to deliver the most respectful, professional and innovative service to people of any religion, culture or tradition.</p>
+
+        <h3>Unattended Cremation</h3>
+        <p>At an unattended cremation, the norm is that the deceased will not be brought to the church, chapel or venue by the funeral parlour involved. No casket will be present during the sermon or memorial service.</p>
+        <p>A sermon or memorial service can be held for the loved one at church, chapel or venue. At no stage will the deceased be present at any of these events.</p>
+        <p>The deceased will be taken to the crematorium in the chosen casket for the cremation to take place. This could be before or after the sermon or memorial service is held. After the cremation took place the remains of the loved one will be handed to the family in an ash box or urn.</p>
+        <p>Utmost care is taken during the cremation process with stringent legislation in place to ensure that the family will only get the remains of their loved one. Martin’s Funeral strives to deliver the most respectful, professional and innovative service to people of any religion, culture or tradition.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Single Funeral Cover Modal -->
+  <div id="coverModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="singleCoverTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="singleCoverTitle">Single Funeral Cover</h2>
+        <button onclick="closeModal('coverModal')" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="plan">
+          <h3>SAPPHIRE</h3>
+          <div class="price">R 110 P/M</div>
+          <ul>
+            <li>R15 000.00 Maximum Cover</li>
+            <li>18 Minimum Age</li>
+            <li>64 Maximum Age</li>
+            <li>6 Months Waiting Period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20SAPPHIRE%20Single%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan">
+          <h3>RUBY</h3>
+          <div class="price">R 145 P/M</div>
+          <ul>
+            <li>R20 000.00 Maximum Cover</li>
+            <li>18 Minimum Age</li>
+            <li>64 Maximum Age</li>
+            <li>6 Months Waiting Period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20RUBY%20Single%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan highlight">
+          <h3>DIAMOND</h3>
+          <div class="price">R 220 P/M</div>
+          <ul>
+            <li>R30 000.00 Maximum Cover</li>
+            <li>18 Minimum Age</li>
+            <li>64 Maximum Age</li>
+            <li>6 Months Waiting Period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20DIAMOND%20Single%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Family Funeral Cover Modal -->
+  <div id="familyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="familyCoverTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="familyCoverTitle">Family Funeral Cover</h2>
+        <button onclick="closeModal('familyModal')" aria-label="Close">×</button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="plan">
+          <h3>SAPPHIRE</h3>
+          <div class="price">R 155 P/M</div>
+          <ul>
+            <li>R15 000.00 Principle Insured (18–64 Years)</li>
+            <li>R15 000.00 Spouse (18–64 Years)</li>
+            <li>R15 000.00 Child (14–21 Years)</li>
+            <li>R7 500.00 Child (6–13 Years)</li>
+            <li>R3 750.00 Child (1–5 Years)</li>
+            <li>R3 750.00 Child (0–11 Months)</li>
+            <li>R3 750.00 Stillborn Child</li>
+            <li>6 Months Waiting Period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20SAPPHIRE%20Family%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan highlight">
+          <h3>FAMILY +5</h3>
+          <div class="price">R 225 P/M</div>
+          <ul>
+            <li>R20 000.00 Max cover</li>
+            <li>18 Min age</li>
+            <li>70 Max age</li>
+            <li>6 months Waiting period</li>
+            <li>12 months Suicide waiting period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20FAMILY%20%2B5%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan">
+          <h3>RUBY</h3>
+          <div class="price">R 200 P/M</div>
+          <ul>
+            <li>R20 000.00 Principle Insured (18–64 Years)</li>
+            <li>R20 000.00 Spouse (18–64 Years)</li>
+            <li>R20 000.00 Child (14–21 Years)</li>
+            <li>R10 000.00 Child (6–13 Years)</li>
+            <li>R5 000.00 Child (1–5 Years)</li>
+            <li>R5 000.00 Child (0–11 Months)</li>
+            <li>R5 000.00 Stillborn Child</li>
+            <li>6 Months Waiting Period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20RUBY%20Family%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan highlight">
+          <h3>FAMILY +9</h3>
+          <div class="price">R 375 P/M</div>
+          <ul>
+            <li>R20 000.00 Max cover</li>
+            <li>18 Min age</li>
+            <li>70 Max age</li>
+            <li>6 months Waiting period</li>
+            <li>12 months Suicide waiting period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20FAMILY%20%2B9%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan">
+          <h3>DIAMOND</h3>
+          <div class="price">R 260 P/M</div>
+          <ul>
+            <li>R30 000.00 Principle Insured (18–64 Years)</li>
+            <li>R30 000.00 Spouse (18–64 Years)</li>
+            <li>R30 000.00 Child (14–21 Years)</li>
+            <li>R15 000.00 Child (6–13 Years)</li>
+            <li>R7 500.00 Child (1–5 Years)</li>
+            <li>R7 500.00 Child (0–11 Months)</li>
+            <li>R7 500.00 Stillborn Child</li>
+            <li>6 Months Waiting Period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20DIAMOND%20Family%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+        <div class="plan highlight">
+          <h3>FAMILY +13</h3>
+          <div class="price">R 525 P/M</div>
+          <ul>
+            <li>R20 000.00 Max cover</li>
+            <li>18 Min age</li>
+            <li>70 Max age</li>
+            <li>6 months Waiting period</li>
+            <li>12 months Suicide waiting period</li>
+          </ul>
+          <a class="plan-btn"
+             href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20I%20am%20interested%20in%20the%20FAMILY%20%2B13%20Funeral%20Cover"
+             target="_blank" rel="noopener">Contact on WhatsApp</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id){
+      const m = document.getElementById(id);
+      if(!m) return;
+      m.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id){
+      const m = document.getElementById(id);
+      if(!m) return;
+      m.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // Close on outside click
+    window.addEventListener('click', function(e){
+      const modals = ['cremationModal','coverModal','familyModal'];
+      for (const id of modals){
+        const m = document.getElementById(id);
+        if (m && e.target === m){
+          closeModal(id);
+        }
+      }
+    });
+
+    // Close on ESC
+    window.addEventListener('keydown', function(e){
+      if (e.key !== 'Escape') return;
+      const modals = ['cremationModal','coverModal','familyModal'];
+      for (const id of modals){
+        const m = document.getElementById(id);
+        if (m && m.style.display === 'block'){
+          closeModal(id);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
