@@ -21,7 +21,7 @@ from flask import (
     session,
     url_for,
 )
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
@@ -32,6 +32,9 @@ COUNTERS_FILE = os.environ.get("COUNTERS_FILE", "counters.json")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "change-me")  # set in Render env vars
 SECRET_KEY = os.environ.get("SECRET_KEY", "change-this-secret")  # set in Render env vars
 app.secret_key = SECRET_KEY
+
+ADMIN_AUTH_FILE = os.environ.get("ADMIN_AUTH_FILE", "admin_auth.json")
+ADMIN_RESET_KEY = os.environ.get("ADMIN_RESET_KEY", "")  # set in Render env vars to allow password resets
 
 # -----------------------------
 # Multi-card directory
@@ -141,8 +144,36 @@ def is_admin_logged_in() -> bool:
     return bool(session.get("admin_logged_in"))
 
 
+def _load_admin_password_hash() -> str | None:
+    """Load persisted admin password hash if present."""
+    try:
+        if os.path.exists(ADMIN_AUTH_FILE):
+            with open(ADMIN_AUTH_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            ph = data.get("password_hash")
+            if isinstance(ph, str) and ph.strip():
+                return ph.strip()
+    except Exception:
+        # Don't crash app if file is corrupt; fall back to env password
+        return None
+    return None
+
+
+def _save_admin_password_hash(password_hash: str) -> None:
+    tmp = ADMIN_AUTH_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump({"password_hash": password_hash}, f, indent=2)
+    os.replace(tmp, ADMIN_AUTH_FILE)
+
+
+
 def password_ok(pw: str) -> bool:
-    # Support both plain-text and hashed password in ADMIN_PASSWORD
+    # 1) Prefer persisted hash (allows reset without changing Render env vars)
+    persisted = _load_admin_password_hash()
+    if persisted:
+        return check_password_hash(persisted, pw)
+
+    # 2) Fallback to env var (supports either a hash or plain text)
     if ADMIN_PASSWORD.startswith("pbkdf2:") or ADMIN_PASSWORD.startswith("scrypt:"):
         return check_password_hash(ADMIN_PASSWORD, pw)
     return pw == ADMIN_PASSWORD
@@ -303,8 +334,58 @@ def admin_logout():
     return redirect(url_for("admin_login"), code=302)
 
 
-@app.post("/admin/reset")
-def admin_reset():
+
+@app.route("/admin/password-reset", methods=["GET", "POST"])
+def admin_password_reset():
+    # This reset flow is protected by a separate environment key.
+    # Set ADMIN_RESET_KEY in Render env vars. Keep it private.
+    if not ADMIN_RESET_KEY:
+        return render_template(
+            "admin_password_reset.html",
+            error="Password reset is not enabled. Set ADMIN_RESET_KEY in your environment variables.",
+            success=None,
+        )
+
+    if request.method == "POST":
+        reset_key = request.form.get("reset_key", "")
+        new_pw = request.form.get("new_password", "")
+        confirm = request.form.get("confirm_password", "")
+
+        if reset_key != ADMIN_RESET_KEY:
+            return render_template(
+                "admin_password_reset.html",
+                error="Incorrect reset key.",
+                success=None,
+            )
+
+        if not new_pw or len(new_pw) < 8:
+            return render_template(
+                "admin_password_reset.html",
+                error="Password must be at least 8 characters.",
+                success=None,
+            )
+
+        if new_pw != confirm:
+            return render_template(
+                "admin_password_reset.html",
+                error="Passwords do not match.",
+                success=None,
+            )
+
+        # Persist new password hash so you don't need to change Render env vars.
+        _save_admin_password_hash(generate_password_hash(new_pw))
+        session.pop("admin_logged_in", None)
+        return render_template(
+            "admin_password_reset.html",
+            error=None,
+            success="Password updated. You can now sign in with the new password.",
+        )
+
+    return render_template("admin_password_reset.html", error=None, success=None)
+
+
+@app.post("/admin/reset-counters")
+def admin_reset_counters():
     if not is_admin_logged_in():
         return redirect(url_for("admin_login"), code=302)
     _save_counters({})

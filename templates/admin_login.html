@@ -62,6 +62,9 @@
       cursor:pointer;
     }
     .btn:hover{background:var(--btnHover)}
+    .helper{margin-top:10px;text-align:center;}
+    .helper a{color:var(--btn);text-decoration:none;font-weight:600;}
+    .helper a:hover{text-decoration:underline;}
     .error{
       margin-top:10px;
       color:#b42318;
@@ -83,6 +86,7 @@
         <label>Password</label>
         <input type="password" name="password" placeholder="Enter admin password" required />
         <button class="btn" type="submit">Sign in</button>
+        <div class="helper"><a href="{{ url_for('admin_password_reset') }}">Forgot / reset password</a></div>
       </form>
       {% if error %}
       <div class="error">{{ error }}</div>
