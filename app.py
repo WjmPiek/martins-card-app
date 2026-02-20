@@ -4,6 +4,8 @@ import base64
 import io
 import json
 import os
+import csv
+import datetime
 from pathlib import Path
 
 import qrcode
@@ -76,20 +78,36 @@ def _save_counters(data: dict):
 
 
 def _load_counters() -> dict:
-    if not os.path.exists(COUNTERS_FILE):
-        _save_counters({})
-        return {}
 
-    try:
-        with open(COUNTERS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if not isinstance(data, dict):
-            data = {}
-        return data
-    except Exception:
-        # If file is corrupted, reset safely
-        _save_counters({})
-        return {}
+if not os.path.exists(COUNTERS_FILE):
+    _save_counters({})
+    return {}
+
+try:
+    with open(COUNTERS_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, dict):
+        data = {}
+
+    # LEGACY SUPPORT:
+    # Older versions stored counters as a single flat dict (not per-slug).
+    # If we detect that shape, migrate it under the default slug.
+    if any(k in data for k in DEFAULT_COUNTERS.keys()) and not any(isinstance(v, dict) for v in data.values()):
+        try:
+            default_slug = get_default_slug()
+        except Exception:
+            default_slug = "wjm"
+        migrated = {default_slug: {}}
+        for k, v in DEFAULT_COUNTERS.items():
+            migrated[default_slug][k] = int(data.get(k, v))
+        data = migrated
+        _save_counters(data)
+
+    return data
+except Exception:
+    # If file is corrupted, reset safely
+    _save_counters({})
+    return {}
 
 
 def increment_counter(slug: str, key: str) -> int:
@@ -122,6 +140,36 @@ def password_ok(pw: str) -> bool:
         return check_password_hash(ADMIN_PASSWORD, pw)
     return pw == ADMIN_PASSWORD
 
+
+
+def build_admin_rows():
+    cards_data = load_cards()
+    cards = cards_data.get("cards", {})
+    all_counters = _load_counters()
+
+    rows = []
+    for slug, c in cards.items():
+        counters = all_counters.get(slug, {})
+        for k, v in DEFAULT_COUNTERS.items():
+            counters.setdefault(k, v)
+
+        rows.append(
+            {
+                "slug": slug,
+                "display_name": c.get("display_name", slug),
+                "contact_save_name": c.get("contact_save_name", ""),
+                "contact_shared": counters.get("contact_shared", 0),
+                "whatsapp_clicks": counters.get("whatsapp_clicks", 0),
+                "email_clicks": counters.get("email_clicks", 0),
+                "map_clicks": counters.get("map_clicks", 0),
+                "share_clicks": counters.get("share_clicks", 0),
+                "nfc_scans": counters.get("nfc_scans", 0),
+                "card_url": f"/c/{slug}",
+            }
+        )
+
+    rows.sort(key=lambda r: r["slug"])
+    return rows
 
 @app.get("/")
 def home():
@@ -181,33 +229,54 @@ def admin():
     if not is_admin_logged_in():
         return redirect(url_for("admin_login"), code=302)
 
-    cards_data = load_cards()
-    cards = cards_data.get("cards", {})
-    all_counters = _load_counters()
-
-    rows = []
-    for slug, c in cards.items():
-        counters = all_counters.get(slug, {})
-        for k, v in DEFAULT_COUNTERS.items():
-            counters.setdefault(k, v)
-
-        rows.append(
-            {
-                "slug": slug,
-                "display_name": c.get("display_name", slug),
-                "contact_save_name": c.get("contact_save_name", ""),
-                "contact_shared": counters.get("contact_shared", 0),
-                "whatsapp_clicks": counters.get("whatsapp_clicks", 0),
-                "email_clicks": counters.get("email_clicks", 0),
-                "map_clicks": counters.get("map_clicks", 0),
-                "share_clicks": counters.get("share_clicks", 0),
-                "nfc_scans": counters.get("nfc_scans", 0),
-                "card_url": f"/c/{slug}",
-            }
-        )
-
-    rows.sort(key=lambda r: r["slug"])
+    rows = build_admin_rows()
     return render_template("admin.html", rows=rows)
+
+
+@app.get("/admin/export.csv")
+def admin_export_csv():
+    if not is_admin_logged_in():
+        return redirect(url_for("admin_login"), code=302)
+
+    rows = build_admin_rows()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "slug",
+        "display_name",
+        "contact_save_name",
+        "contact_shared",
+        "whatsapp_clicks",
+        "email_clicks",
+        "map_clicks",
+        "share_clicks",
+        "nfc_scans",
+        "card_url",
+    ])
+    for r in rows:
+        writer.writerow([
+            r["slug"],
+            r["display_name"],
+            r["contact_save_name"],
+            r["contact_shared"],
+            r["whatsapp_clicks"],
+            r["email_clicks"],
+            r["map_clicks"],
+            r["share_clicks"],
+            r["nfc_scans"],
+            r["card_url"],
+        ])
+
+    csv_data = output.getvalue()
+    output.close()
+
+    ts = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    return Response(
+        csv_data,
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f"attachment; filename=card-stats-{ts}.csv"},
+    )
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
