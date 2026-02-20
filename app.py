@@ -7,6 +7,7 @@ import os
 import csv
 import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 import qrcode
 from flask import (
@@ -78,36 +79,42 @@ def _save_counters(data: dict):
 
 
 def _load_counters() -> dict:
+    """Load counters from disk.
 
-if not os.path.exists(COUNTERS_FILE):
-    _save_counters({})
-    return {}
+    Stored shape is {slug: {counter_key: int, ...}, ...}.
+    Also supports migrating older flat dicts into the per-slug format.
+    """
+    if not os.path.exists(COUNTERS_FILE):
+        _save_counters({})
+        return {}
 
-try:
-    with open(COUNTERS_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    if not isinstance(data, dict):
-        data = {}
+    try:
+        with open(COUNTERS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            data = {}
 
-    # LEGACY SUPPORT:
-    # Older versions stored counters as a single flat dict (not per-slug).
-    # If we detect that shape, migrate it under the default slug.
-    if any(k in data for k in DEFAULT_COUNTERS.keys()) and not any(isinstance(v, dict) for v in data.values()):
-        try:
-            default_slug = get_default_slug()
-        except Exception:
-            default_slug = "wjm"
-        migrated = {default_slug: {}}
-        for k, v in DEFAULT_COUNTERS.items():
-            migrated[default_slug][k] = int(data.get(k, v))
-        data = migrated
-        _save_counters(data)
+        # LEGACY SUPPORT:
+        # Older versions stored counters as a single flat dict (not per-slug).
+        # If we detect that shape, migrate it under the default slug.
+        if any(k in data for k in DEFAULT_COUNTERS.keys()) and not any(
+            isinstance(v, dict) for v in data.values()
+        ):
+            try:
+                default_slug = get_default_slug()
+            except Exception:
+                default_slug = "wjm"
+            migrated = {default_slug: {}}
+            for k, v in DEFAULT_COUNTERS.items():
+                migrated[default_slug][k] = int(data.get(k, v))
+            data = migrated
+            _save_counters(data)
 
-    return data
-except Exception:
-    # If file is corrupted, reset safely
-    _save_counters({})
-    return {}
+        return data
+    except Exception:
+        # If file is corrupted, reset safely
+        _save_counters({})
+        return {}
 
 
 def increment_counter(slug: str, key: str) -> int:
@@ -200,7 +207,7 @@ def go_whatsapp(slug):
     msg = request.args.get("text", "")
     base = f"https://wa.me/{c['whatsapp_e164']}"
     if msg:
-        return redirect(base + "?text=" + msg, code=302)
+        return redirect(base + "?text=" + quote(msg), code=302)
     return redirect(base, code=302)
 
 
@@ -211,7 +218,7 @@ def go_email(slug):
         return abort(404)
     increment_counter(slug, "email_clicks")
     subject = request.args.get("subject", "Enquiry from Website")
-    return redirect(f"mailto:{c['email']}?subject={subject}", code=302)
+    return redirect(f"mailto:{c['email']}?subject={quote(subject)}", code=302)
 
 
 @app.get("/go/map/<slug>")
@@ -306,8 +313,17 @@ def admin_reset():
 
 @app.get("/qr.png")
 def qr_png():
+    # Backwards compatible: serve QR for the default card
+    return redirect(url_for("qr_png_slug", slug=get_default_slug()), code=302)
+
+
+@app.get("/qr/<slug>.png")
+def qr_png_slug(slug):
+    c = get_card(slug)
+    if not c:
+        return abort(404)
     base_url = request.host_url.rstrip("/")
-    url = base_url + "/go/nfc/" + get_default_slug()  # track scans
+    url = base_url + "/go/nfc/" + slug  # track scans
     img = qrcode.make(url)
     buf = io.BytesIO()
     img.save(buf, format="PNG")
@@ -352,24 +368,28 @@ def vcard_slug(slug):
     increment_counter(slug, "contact_shared")
 
     image_path = Path("static") / c.get("photo_filename", "profile.jpg")
-    encoded_image = base64.b64encode(image_path.read_bytes()).decode("utf-8")
+    encoded_image = ""
+    try:
+        encoded_image = base64.b64encode(image_path.read_bytes()).decode("utf-8")
+    except Exception:
+        encoded_image = ""
 
-    vcf = "\r\n".join(
-        [
-            "BEGIN:VCARD",
-            "VERSION:3.0",
-            f"FN:{c['contact_save_name']}",
-            f"ORG:{c['org']}",
-            f"TITLE:{c['title']}",
-            f"TEL;TYPE=CELL,VOICE:+{c['whatsapp_e164']}",
-            f"TEL;TYPE=WORK,VOICE:+{c['office_e164']}",
-            f"EMAIL;TYPE=WORK:{c['email']}",
-            f"URL:{c['website_url']}",
-            f"PHOTO;ENCODING=b;TYPE=JPEG:{encoded_image}",
-            "END:VCARD",
-            "",
-        ]
-    )
+    lines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        f"FN:{c['contact_save_name']}",
+        f"ORG:{c['org']}",
+        f"TITLE:{c['title']}",
+        f"TEL;TYPE=CELL,VOICE:+{c['whatsapp_e164']}",
+        f"TEL;TYPE=WORK,VOICE:+{c['office_e164']}",
+        f"EMAIL;TYPE=WORK:{c['email']}",
+        f"URL:{c['website_url']}",
+    ]
+    if encoded_image:
+        lines.append(f"PHOTO;ENCODING=b;TYPE=JPEG:{encoded_image}")
+    lines += ["END:VCARD", ""]
+
+    vcf = "\r\n".join(lines)
 
     safe_name = slug.replace("/", "_")
     return Response(
@@ -383,6 +403,7 @@ def vcard_slug(slug):
 
 
 @app.get("/go/share/<slug>")
+
 def go_share(slug):
     c = get_card(slug)
     if not c:

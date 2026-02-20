@@ -499,7 +499,7 @@ a{ text-decoration:none; }
 
   <div class="row">
     <span>WhatsApp</span>
-    <a href="{{ url_for('go_whatsapp', slug=slug) }}?to={{ whatsapp_e164 }}" target="_blank" rel="noopener">{{ whatsapp_display }}</a>
+    <a href="{{ url_for('go_whatsapp', slug=slug) }}" target="_blank" rel="noopener">{{ whatsapp_display }}</a>
   </div>
 
   <div class="row">
@@ -509,7 +509,7 @@ a{ text-decoration:none; }
 
   <div class="row">
     <span>Email</span>
-    <a href="{{ url_for('go_email', slug=slug) }}?to={{ email }}&subject=Enquiry%20from%20Website">{{ email }}</a>
+    <a href="{{ url_for('go_email', slug=slug) }}?subject=Enquiry%20from%20Website">{{ email }}</a>
   </div>
 
   <div class="row">
@@ -521,11 +521,11 @@ a{ text-decoration:none; }
     <span>Address</span>
     <a href="{{ url_for('go_map', slug=slug) }}"
        target="_blank" rel="noopener">
-      208 Weltevreden Road, Northcliff
+      {{ address_text }}
     </a>
   </div>
 
-<a class="btn" href="{{ url_for('vcard') }}">Save to Contacts</a>
+<a class="btn" href="{{ url_for('vcard_slug', slug=slug) }}">Save to Contacts</a>
       <a class="btn" href="mailto:{{ email }}?subject=Funeral%20Service%20Enquiry">Email Us</a>
       <a class="btn" href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20Wjm%2C%20I%20need%20assistance%20please."
          target="_blank" rel="noopener">WhatsApp</a>
@@ -539,7 +539,7 @@ a{ text-decoration:none; }
     </div>
 
     <div class="footer">
-      {{ org }} • {{ address_display }}
+      {{ org }} • {{ address_text }}
     </div>
   </div>
 
@@ -820,9 +820,9 @@ a{ text-decoration:none; }
         Use this QR code on print material, posters, or email signatures.
         Scanning opens your digital business card instantly.
       </p>
-      <img src="{{ url_for('qr_png') }}" alt="QR Code" style="width:240px; height:240px; border-radius:16px; border:1px solid var(--line); background:#fff; padding:10px;">
+      <img src="{{ url_for('qr_png_slug', slug=slug) }}" alt="QR Code" style="width:240px; height:240px; border-radius:16px; border:1px solid var(--line); background:#fff; padding:10px;">
       <div style="height:14px;"></div>
-      <a class="btn" href="{{ url_for('qr_png') }}" target="_blank" rel="noopener">Open QR Image</a>
+      <a class="btn" href="{{ url_for('qr_png_slug', slug=slug) }}" target="_blank" rel="noopener">Open QR Image</a>
     </div>
   </div>
 </div>
