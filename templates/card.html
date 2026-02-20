@@ -6,10 +6,6 @@
   <title>{{ display_name }} | {{ org }}</title>
 
   <style>
-
-
-
-
     :root{
       /* Theme */
       --bg:#F5F6FA;                 /* soft silver background */
@@ -49,23 +45,21 @@
     }
 
     .top{
-padding:25px 20px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg, rgba(200,162,200,0.14), rgba(229,231,235,0.65));
-}
+      padding:20px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      gap:16px;
+      align-items:center;
+      background:linear-gradient(135deg, rgba(200,162,200,0.14), rgba(229,231,235,0.65));
+    }
 
     .branding{
-display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  gap:14px;
-  width:100%;
-}
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      flex: 0 0 auto;
+    }
 
     .logo{
 
@@ -85,17 +79,13 @@ display:flex;
 
     /* Profile photo under logo */
     .profile-frame{
-width: 210px;
-  height: 210px;
-  border-radius: 999px;
-  padding: 6px;
-  background: linear-gradient(135deg, rgba(200,162,200,0.95), rgba(229,231,235,0.95));
-  box-shadow: 0 18px 45px rgba(106,27,154,0.16);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin: 10px 0 4px 0;
-}
+      width:118px;
+      height:118px;
+      border-radius:50%;
+      padding:4px;
+      background:linear-gradient(135deg,var(--primary),var(--bg2));
+      box-shadow:0 12px 26px rgba(106,27,154,0.18);
+    }
     .profile-frame img{
       width:100%;
       height:100%;
@@ -107,43 +97,52 @@ width: 210px;
     .headertext{flex:1; min-width:0}
 
     .company{
-font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-align: center;
-  margin-top: 8px;
-  color: #6A1B9A;
-}
+      font-size:12px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
     .name{
-font-size: 28px;
-  font-weight: 800;
-  text-align: center;
-  margin-top: 6px;
-}
+      font-size:24px;
+      font-weight:850;
+      margin:6px 0 2px;
+      letter-spacing:-0.02em;
+      line-height:1.15;
+    }
 
     .title{
-font-size: 18px;
-  text-align: center;
-  opacity: 0.85;
-}
+      color:var(--muted);
+      font-size:14px;
+    }
 
     .section{ padding:20px; }
 
     .row{
-display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px 20px;
-}
-    .row span{
-font-size:18px;
-  font-weight:700;
-}
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:12px 12px;
+      margin-bottom:10px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(200,162,200,0.08), rgba(229,231,235,0.45));
+      border:1px solid var(--line);
+    }
+    .row span{color:var(--muted);font-size:13px; flex:0 0 auto;}
     .row a{
-text-decoration:none;
-  color:inherit;
-}
+      color:var(--text);
+      text-decoration:none;
+      font-weight:650;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 68%;
+      text-align:right;
+    }
 
     /* Buttons */
     .btn{
@@ -385,41 +384,64 @@ body{
   box-shadow: 0 14px 28px rgba(106,27,154,0.16);
 }
 
-/* Centered v5 */
-.logo-wrap{
-          text-align:center;
-          margin: 30px 0 10px 0;
-        }
-.logo-img{
-      max-width: 320px;
-      width: 85%;
-      height: auto;
-      display:block;
-      margin: 0 auto 20px auto;
-    }
-.profile-wrap{
-display:flex;
-  justify-content:center;
-  margin: 0;
+/* Share-to-number */
+a{ text-decoration:none; }
+.share-to{
+  width: 100%;
+  max-width: 520px;
+  margin: 14px auto 18px auto;
+  padding: 16px 16px;
+  border: 1px solid rgba(106,27,154,0.14);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 14px 34px rgba(17,24,39,0.08);
+  text-align:left;
 }
-.profile-img{
-width: 190px;
-  height: 190px;
-  border-radius: 999px;
-  object-fit: cover;
-  box-shadow: 0 22px 55px rgba(17,24,39,0.18);
-  border: 4px solid rgba(255,255,255,0.95);
-  background: #fff;
+.share-to-title{
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  color: #111827;
+  margin-bottom: 4px;
 }
-.header.hero{
-  text-align:center;
+.share-to-sub{
+  font-size: 13px;
+  color: rgba(17,24,39,0.70);
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+.share-to-row{
+  display:flex;
+  gap: 10px;
   align-items:center;
-  justify-content:center;
 }
-
-
-
-
+#clientNumber{
+  flex: 1;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid rgba(106,27,154,0.18);
+  padding: 0 14px;
+  font-size: 16px;
+  outline: none;
+  background: rgba(249,250,251,0.9);
+}
+#clientNumber:focus{
+  border-color: rgba(106,27,154,0.35);
+  box-shadow: 0 0 0 6px rgba(200,162,200,0.25);
+}
+.share-to-btn{
+  min-width: 104px;
+  height: 46px;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  border-radius: 14px;
+}
+.share-to-hint{
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(17,24,39,0.55);
+}
 
 </style>
 <!-- Microsoft Clarity (Heatmap Tracking)
@@ -437,18 +459,16 @@ width: 190px;
 </head>
 
 <body>
-  <div class="logo-wrap hero">
-    <img class="logo-img" src="{{ url_for('static', filename=logo_filename) }}" alt="Logo" onerror="this.remove();">
-  </div>
-
   <div class="card">
 
     <div class="top">
   <div class="branding">
-<div class="profile-frame">
-      <div class="profile-wrap hero">
-      <img class="profile-img" src="{{ url_for('static', filename=photo_filename) }}" alt="{{ display_name }}" onerror="this.remove();">
+    <div class="logo logo-lg">
+      <img src="{{ url_for('static', filename=logo_filename) }}" alt="Logo" onerror="this.remove();">
     </div>
+
+    <div class="profile-frame">
+      <img src="{{ url_for('static', filename=photo_filename) }}" alt="{{ display_name }}" onerror="this.remove();">
     </div>
 
     <div class="company">{{ org }}</div>
@@ -458,7 +478,17 @@ width: 190px;
 </div>
 
 <div class="section">
-
+<div class="nfc-prompt reveal">
+  <div class="nfc-icon" aria-hidden="true">
+    <span class="ring r1"></span>
+    <span class="ring r2"></span>
+    <span class="ring r3"></span>
+    <span class="chip"></span>
+  </div>
+  <div>
+    <div class="nfc-title">Tap NFC Card</div>
+    <div class="nfc-sub">Hold your phone near the card to open this profile instantly.</div>
+  </div>
 </div>
 
 
@@ -839,6 +869,34 @@ const url = window.location.href;
     }catch(e){
       // user cancelled
     }
+  }
+</script>
+
+<script>
+  function normalizeZaNumber(raw){
+    let s = (raw || "").replace(/\s+/g,'').replace(/[^0-9+]/g,'');
+    if(!s) return "";
+    if(s.startsWith("+")) s = s.slice(1);
+    if(s.startsWith("0") && s.length === 10){
+      s = "27" + s.slice(1);
+    }
+    s = s.replace(/^00/,"");
+    return s;
+  }
+
+  async function shareToNumber(){
+    const inp = document.getElementById("clientNumber");
+    const raw = inp ? inp.value : "";
+    const num = normalizeZaNumber(raw);
+    if(!num){
+      alert("Please enter a valid client WhatsApp number.");
+      return;
+    }
+    // Count share taps (server-side)
+    try{ await fetch("{{ url_for('go_share', slug=slug) }}", {method:"GET", cache:"no-store"}); }catch(e){}
+    const url = window.location.href;
+    const text = encodeURIComponent("Hi! Here are my details: " + url);
+    window.location.href = "https://wa.me/" + num + "?text=" + text;
   }
 </script>
 

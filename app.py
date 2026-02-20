@@ -52,7 +52,8 @@ DEFAULT_COUNTERS = {
     "whatsapp_clicks": 0,
     "email_clicks": 0,
     "map_clicks": 0,
-    "share_clicks": 0
+    "share_clicks": 0,
+    "nfc_scans": 0
 }
 
 def _load_counters():
@@ -308,7 +309,13 @@ def go_share(slug):
     increment_counter(slug, "share_clicks")
     return ("", 204)
 
+@app.get("/go/nfc/<slug>")
+def go_nfc(slug):
+    c = get_card(slug)
+    if not c:
+        return abort(404)
+    increment_counter(slug, "nfc_scans")
+    return redirect(url_for("card", slug=slug))
+
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)

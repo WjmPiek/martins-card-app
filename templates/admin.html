@@ -63,6 +63,7 @@
           <th>Email</th>
           <th>Map</th>
           <th>Share</th>
+          <th>NFC</th>
         </tr>
         {% for r in rows %}
         <tr>
@@ -77,6 +78,7 @@
           <td>{{ r.email_clicks }}</td>
           <td>{{ r.map_clicks }}</td>
           <td>{{ r.share_clicks }}</td>
+          <td>{{ r.nfc_scans }}</td>
         </tr>
         {% endfor %}
       </table>
