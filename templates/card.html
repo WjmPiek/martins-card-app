@@ -8,6 +8,7 @@
   <style>
 
 
+
     :root{
       /* Theme */
       --bg:#F5F6FA;                 /* soft silver background */
@@ -47,21 +48,24 @@
     }
 
     .top{
-      padding:20px;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      gap:16px;
-      align-items:center;
-      background:linear-gradient(135deg, rgba(200,162,200,0.14), rgba(229,231,235,0.65));
-    }
+padding:25px 20px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg, rgba(200,162,200,0.14), rgba(229,231,235,0.65));
+}
 
     .branding{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-      flex: 0 0 auto;
-    }
+display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:14px;
+  width:100%;
+}
 
     .logo{
 
@@ -137,17 +141,15 @@ font-size: 18px;
       background:linear-gradient(135deg, rgba(200,162,200,0.08), rgba(229,231,235,0.45));
       border:1px solid var(--line);
     }
-    .row span{color:var(--muted);font-size:13px; flex:0 0 auto;}
+    .row span{
+font-size:18px;
+  font-weight:700;
+}
     .row a{
-      color:var(--text);
-      text-decoration:none;
-      font-weight:650;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 68%;
-      text-align:right;
-    }
+font-size:18px;
+  font-weight:700;
+  color:#111827;
+}
 
     /* Buttons */
     .btn{
@@ -420,6 +422,7 @@ width: 190px;
   align-items:center;
   justify-content:center;
 }
+
 
 
 
