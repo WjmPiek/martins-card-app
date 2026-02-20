@@ -289,7 +289,114 @@
       margin-top: 10px;
     }
 
-  </style>
+  
+    .share-counter{
+      margin-bottom:16px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(200,162,200,0.15);
+      text-align:center;
+      font-size:14px;
+      border:1px solid var(--line);
+    }
+  /* Premium v3 */
+body{
+  background: radial-gradient(1200px 600px at 20% 10%, rgba(200,162,200,0.35), transparent 60%),
+              radial-gradient(900px 600px at 80% 15%, rgba(229,231,235,0.75), transparent 55%),
+              linear-gradient(180deg, #F9FAFB, #EEF2F7);
+  color: #1F2937;
+}
+.card{ box-shadow: 0 20px 55px rgba(17,24,39,0.12); }
+.hero{ animation: heroFade 850ms ease-out both; }
+@keyframes heroFade{ from{opacity:0; transform: translateY(10px);} to{opacity:1; transform: translateY(0);} }
+
+/* Reveal on scroll */
+.reveal{opacity:0; transform: translateY(12px); transition: all 700ms ease;}
+.reveal.in{opacity:1; transform: translateY(0);}
+
+/* NFC prompt */
+.nfc-prompt{
+  display:flex; gap:12px; align-items:center;
+  padding:14px 14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px rgba(17,24,39,0.06);
+  margin: 0 0 16px 0;
+}
+.nfc-title{font-weight:900; letter-spacing:0.2px; font-size:14px;}
+.nfc-sub{color: var(--muted); font-size:13px; line-height:1.35;}
+.nfc-icon{position:relative; width:44px; height:44px; flex:0 0 44px;}
+.nfc-icon .chip{
+  position:absolute; inset:12px;
+  border-radius:12px;
+  background: linear-gradient(135deg, rgba(200,162,200,0.9), rgba(229,231,235,0.95));
+  border: 1px solid rgba(106,27,154,0.18);
+  box-shadow: 0 10px 20px rgba(17,24,39,0.10);
+}
+.nfc-icon .ring{
+  position:absolute; inset:0;
+  border-radius:999px;
+  border:2px solid rgba(106,27,154,0.22);
+  opacity:0;
+  animation: nfcPulse 1.8s ease-out infinite;
+}
+.nfc-icon .r2{animation-delay: 0.35s;}
+.nfc-icon .r3{animation-delay: 0.7s;}
+@keyframes nfcPulse{
+  0%{transform:scale(0.65); opacity:0.0;}
+  30%{opacity:0.35;}
+  100%{transform:scale(1.1); opacity:0.0;}
+}
+
+/* Sticky WhatsApp FAB */
+.whatsapp-fab{
+  position: fixed; right: 16px; bottom: 16px;
+  width: 56px; height: 56px; border-radius: 999px;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(106,27,154,0.18);
+  box-shadow: 0 18px 45px rgba(17,24,39,0.18);
+  display: grid; place-items: center;
+  z-index: 9999; text-decoration: none;
+  backdrop-filter: blur(10px);
+}
+.whatsapp-fab svg{width:28px; height:28px; fill: rgba(34,197,94,0.95);}
+.whatsapp-fab .wa-dot{
+  position:absolute; width:10px; height:10px; border-radius:999px;
+  background: rgba(34,197,94,0.95);
+  top: 10px; right: 10px;
+  box-shadow: 0 0 0 0 rgba(34,197,94,0.50);
+  animation: waPing 1.6s ease-out infinite;
+}
+@keyframes waPing{
+  0%{box-shadow:0 0 0 0 rgba(34,197,94,0.45);}
+  100%{box-shadow:0 0 0 14px rgba(34,197,94,0);}
+}
+
+/* Buttons: premium depth */
+.btn{
+  box-shadow: 0 10px 22px rgba(106,27,154,0.12);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(106,27,154,0.16);
+}
+
+</style>
+<!-- Microsoft Clarity (Heatmap Tracking)
+     1) Create a project at https://clarity.microsoft.com
+     2) Replace YOUR_CLARITY_ID below with your Clarity Project ID
+-->
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/YOUR_CLARITY_ID";
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script");
+</script>
+
 </head>
 
 <body>
@@ -298,11 +405,11 @@
     <div class="top">
   <div class="branding">
     <div class="logo logo-lg">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onerror="this.remove();">
+      <img src="{{ url_for('static', filename=logo_filename) }}" alt="Logo" onerror="this.remove();">
     </div>
 
     <div class="profile-frame">
-      <img src="{{ url_for('static', filename='profile.jpg') }}" alt="{{ display_name }}" onerror="this.remove();">
+      <img src="{{ url_for('static', filename=photo_filename) }}" alt="{{ display_name }}" onerror="this.remove();">
     </div>
 
     <div class="company">{{ org }}</div>
@@ -312,10 +419,28 @@
 </div>
 
 <div class="section">
+<div class="nfc-prompt reveal">
+  <div class="nfc-icon" aria-hidden="true">
+    <span class="ring r1"></span>
+    <span class="ring r2"></span>
+    <span class="ring r3"></span>
+    <span class="chip"></span>
+  </div>
+  <div>
+    <div class="nfc-title">Tap NFC Card</div>
+    <div class="nfc-sub">Hold your phone near the card to open this profile instantly.</div>
+  </div>
+</div>
+
+
+  <div class="share-counter">
+    <strong>Contact Shared:</strong> {{ share_count }} times
+  </div>
+
 
   <div class="row">
     <span>WhatsApp</span>
-    <a href="https://wa.me/{{ whatsapp_e164 }}" target="_blank" rel="noopener">{{ whatsapp_display }}</a>
+    <a href="{{ url_for('go_whatsapp', slug=slug) }}?to={{ whatsapp_e164 }}" target="_blank" rel="noopener">{{ whatsapp_display }}</a>
   </div>
 
   <div class="row">
@@ -325,7 +450,7 @@
 
   <div class="row">
     <span>Email</span>
-    <a href="mailto:{{ email }}?subject=Enquiry%20from%20Website">{{ email }}</a>
+    <a href="{{ url_for('go_email', slug=slug) }}?to={{ email }}&subject=Enquiry%20from%20Website">{{ email }}</a>
   </div>
 
   <div class="row">
@@ -335,7 +460,7 @@
 
   <div class="row">
     <span>Address</span>
-    <a href="https://www.google.com/maps/dir/?api=1&destination=208%20Weltevreden%20Road%2C%20Northcliff"
+    <a href="{{ url_for('go_map', slug=slug) }}"
        target="_blank" rel="noopener">
       208 Weltevreden Road, Northcliff
     </a>
@@ -624,5 +749,69 @@
       }
     });
   </script>
+<!-- QR Code Modal -->
+<div id="qrModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Scan to open this card</h2>
+      <button onclick="closeQR()">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <p class="note" style="margin-top:0;">
+        Use this QR code on print material, posters, or email signatures.
+        Scanning opens your digital business card instantly.
+      </p>
+      <img src="{{ url_for('qr_png') }}" alt="QR Code" style="width:240px; height:240px; border-radius:16px; border:1px solid var(--line); background:#fff; padding:10px;">
+      <div style="height:14px;"></div>
+      <a class="btn" href="{{ url_for('qr_png') }}" target="_blank" rel="noopener">Open QR Image</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function openQR(){document.getElementById('qrModal').style.display='block';}
+function closeQR(){document.getElementById('qrModal').style.display='none';}
+</script>
+<!-- Sticky WhatsApp Button -->
+<a class="whatsapp-fab" href="{{ url_for('go_whatsapp', slug=slug) }}" aria-label="Chat on WhatsApp">
+  <span class="wa-dot"></span>
+  <svg viewBox="0 0 32 32" aria-hidden="true">
+    <path d="M19.11 17.55c-.29-.14-1.69-.83-1.95-.92-.26-.1-.45-.14-.64.14-.19.29-.73.92-.89 1.11-.16.19-.33.21-.62.07-.29-.14-1.22-.45-2.33-1.44-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.59.13-.13.29-.33.44-.49.15-.16.19-.26.29-.45.1-.19.05-.36-.02-.5-.07-.14-.64-1.55-.88-2.12-.23-.55-.46-.48-.64-.49h-.55c-.19 0-.5.07-.76.36-.26.29-1 1-1 2.44 0 1.44 1.02 2.83 1.16 3.03.14.19 2 3.05 4.84 4.27.68.29 1.21.46 1.63.59.68.22 1.3.19 1.79.12.55-.08 1.69-.69 1.93-1.36.24-.67.24-1.25.17-1.36-.07-.12-.26-.19-.55-.33zM16.02 27.2h-.01c-1.82 0-3.59-.49-5.13-1.42l-.37-.22-3.83 1 1.02-3.73-.24-.38c-1.02-1.62-1.56-3.49-1.56-5.41 0-5.6 4.56-10.16 10.16-10.16 2.71 0 5.26 1.06 7.17 2.98 1.92 1.92 2.98 4.47 2.98 7.18 0 5.6-4.56 10.16-10.18 10.16zm8.64-18.82A12.14 12.14 0 0 0 16.03 4.8C9.51 4.8 4.2 10.11 4.2 16.63c0 2.14.56 4.23 1.62 6.06L4.1 29l6.47-1.69a11.8 11.8 0 0 0 5.46 1.33h.01c6.52 0 11.83-5.31 11.83-11.83 0-3.16-1.23-6.13-3.21-8.43z"/>
+  </svg>
+</a>
+
+<script>
+  // Reveal on scroll
+  (function(){
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold: 0.12});
+    els.forEach(el=>io.observe(el));
+  })();
+
+  // Native Web Share
+  async function shareCard(){
+        // Count share taps (server-side)
+        try{ await fetch("{{ url_for('go_share', slug=slug) }}", {method:"GET", cache:"no-store"}); }catch(e){}
+const url = window.location.href;
+    const title = document.title || "Digital Card";
+    try{
+      if(navigator.share){
+        await navigator.share({ title, url });
+      }else if(navigator.clipboard){
+        await navigator.clipboard.writeText(url);
+        alert("Link copied. You can paste it into WhatsApp or SMS.");
+      }else{
+        prompt("Copy this link:", url);
+      }
+    }catch(e){
+      // user cancelled
+    }
+  }
+</script>
+
 </body>
 </html>
