@@ -384,6 +384,37 @@ body{
   box-shadow: 0 14px 28px rgba(106,27,154,0.16);
 }
 
+/* Centered v5 */
+.logo-wrap{
+  text-align:center;
+  margin: 22px 0 8px 0;
+}
+.logo-img{
+  max-width: 200px;
+  width: 70%;
+  height: auto;
+  display:inline-block;
+}
+.profile-wrap{
+  display:flex;
+  justify-content:center;
+  margin: 14px 0 10px 0;
+}
+.profile-img{
+  width: 132px;
+  height: 132px;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 18px 40px rgba(17,24,39,0.12);
+  border: 3px solid rgba(200,162,200,0.50);
+  background: #fff;
+}
+.header.hero{
+  text-align:center;
+  align-items:center;
+  justify-content:center;
+}
+
 </style>
 <!-- Microsoft Clarity (Heatmap Tracking)
      1) Create a project at https://clarity.microsoft.com
@@ -400,16 +431,22 @@ body{
 </head>
 
 <body>
+  <div class="logo-wrap hero">
+    <img class="logo-img" src="{{ url_for('static', filename=logo_filename) }}" alt="Logo" onerror="this.remove();">
+  </div>
+
   <div class="card">
 
     <div class="top">
   <div class="branding">
     <div class="logo logo-lg">
-      <img src="{{ url_for('static', filename=logo_filename) }}" alt="Logo" onerror="this.remove();">
+      
     </div>
 
     <div class="profile-frame">
-      <img src="{{ url_for('static', filename=photo_filename) }}" alt="{{ display_name }}" onerror="this.remove();">
+      <div class="profile-wrap hero">
+      <img class="profile-img" src="{{ url_for('static', filename=photo_filename) }}" alt="{{ display_name }}" onerror="this.remove();">
+    </div>
     </div>
 
     <div class="company">{{ org }}</div>

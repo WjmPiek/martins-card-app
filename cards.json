@@ -1,0 +1,56 @@
+{
+  "default_slug": "wjm",
+  "cards": {
+    "wjm": {
+      "display_name": "Wjm Piek",
+      "contact_save_name": "Wjm Martin’s Funerals",
+      "org": "Martin’s Funerals",
+      "title": "Director",
+      "whatsapp_display": "082 561 5932",
+      "whatsapp_e164": "27825615932",
+      "office_display": "010 448 0921",
+      "office_e164": "27104480921",
+      "email": "wjm@martinsdirect.com",
+      "website_display": "martinsnorthcliff.com",
+      "website_url": "https://www.martinsnorthcliff.com",
+      "address_text": "208 Weltevreden Road, Northcliff",
+      "maps_destination": "208%20Weltevreden%20Road%2C%20Northcliff",
+      "photo_filename": "profile.jpg",
+      "logo_filename": "logo.png"
+    },
+    "consultant-1": {
+      "display_name": "Consultant 1",
+      "contact_save_name": "Martin’s Funerals Consultant 1",
+      "org": "Martin’s Funerals",
+      "title": "Consultant",
+      "whatsapp_display": "08X XXX XXXX",
+      "whatsapp_e164": "27XXXXXXXXX",
+      "office_display": "010 448 0921",
+      "office_e164": "27104480921",
+      "email": "consultant1@martinsnorthcliff.com",
+      "website_display": "martinsnorthcliff.com",
+      "website_url": "https://www.martinsnorthcliff.com",
+      "address_text": "208 Weltevreden Road, Northcliff",
+      "maps_destination": "208%20Weltevreden%20Road%2C%20Northcliff",
+      "photo_filename": "profile.jpg",
+      "logo_filename": "logo.png"
+    },
+    "consultant-2": {
+      "display_name": "Consultant 2",
+      "contact_save_name": "Martin’s Funerals Consultant 2",
+      "org": "Martin’s Funerals",
+      "title": "Consultant",
+      "whatsapp_display": "08X XXX XXXX",
+      "whatsapp_e164": "27XXXXXXXXX",
+      "office_display": "010 448 0921",
+      "office_e164": "27104480921",
+      "email": "consultant2@martinsnorthcliff.com",
+      "website_display": "martinsnorthcliff.com",
+      "website_url": "https://www.martinsnorthcliff.com",
+      "address_text": "208 Weltevreden Road, Northcliff",
+      "maps_destination": "208%20Weltevreden%20Road%2C%20Northcliff",
+      "photo_filename": "profile.jpg",
+      "logo_filename": "logo.png"
+    }
+  }
+}
