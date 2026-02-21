@@ -536,7 +536,7 @@ a{ text-decoration:none; }
     </a>
   </div>
 
-<a class="btn" href="{{ url_for('vcard_slug', slug=slug) }}">Save to Contacts</a>
+<a class="btn" onclick="shareContact()">Share Contact</a>
       <a class="btn" href="mailto:{{ email }}?subject=Funeral%20Service%20Enquiry">Email Us</a>
       <a class="btn" href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20Wjm%2C%20I%20need%20assistance%20please."
          target="_blank" rel="noopener">WhatsApp</a>
@@ -908,6 +908,37 @@ const url = window.location.href;
     const url = window.location.href;
     const text = encodeURIComponent("Hi! Here are my details: " + url);
     window.location.href = "https://wa.me/" + num + "?text=" + text;
+  }
+</script>
+
+<script>
+  // Share the vCard (.vcf) contact file via the native share sheet (iOS/Android).
+  // Falls back to downloading/opening the VCF if file-sharing isn't supported.
+  async function shareContact(){
+    const vcfUrl = "{{ url_for('vcard_slug', slug=slug) }}";
+    const fileName = "{{ slug }}.vcf";
+
+    // Count share taps (server-side)
+    try{ await fetch("{{ url_for('go_share', slug=slug) }}", {method:"GET", cache:"no-store"}); }catch(e){}
+
+    try{
+      const resp = await fetch(vcfUrl, {cache:"no-store"});
+      const blob = await resp.blob();
+      const file = new File([blob], fileName, { type: "text/vcard" });
+
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        await navigator.share({
+          title: "{{ display_name }}",
+          files: [file]
+        });
+        return;
+      }
+    }catch(e){
+      // ignore and fall back
+    }
+
+    // Fallback: open/download the VCF
+    window.location.href = vcfUrl;
   }
 </script>
 

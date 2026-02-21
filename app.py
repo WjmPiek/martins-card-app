@@ -499,7 +499,7 @@ def go_nfc(slug):
     if not c:
         return abort(404)
     increment_counter(slug, "nfc_scans")
-    return redirect(url_for("card", slug=slug))
+    return redirect(url_for("vcard_slug", slug=slug))
 
 
 if __name__ == "__main__":
