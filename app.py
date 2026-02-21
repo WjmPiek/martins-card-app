@@ -498,20 +498,8 @@ def go_nfc(slug):
     c = get_card(slug)
     if not c:
         return abort(404)
-
     increment_counter(slug, "nfc_scans")
-
-    # iOS Safari opens the .vcf viewer when navigating to it.
-    # After the user saves, they typically hit "Back" to return.
-    # We render a small landing page that:
-    #  - auto-opens the .vcf once
-    #  - when the user returns, auto-redirects them to the profile page.
-    return render_template(
-        "nfc_save.html",
-        slug=slug,
-        display_name=c.get("display_name", slug),
-    )
-
+    return redirect(url_for("card", slug=slug))
 
 
 if __name__ == "__main__":

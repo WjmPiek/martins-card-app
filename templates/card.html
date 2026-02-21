@@ -536,7 +536,7 @@ a{ text-decoration:none; }
     </a>
   </div>
 
-<a class="btn" onclick="shareContact()">Share Contact</a>
+<a class="btn" onclick="openShareOptions()">Share Contact</a>
       <a class="btn" href="mailto:{{ email }}?subject=Funeral%20Service%20Enquiry">Email Us</a>
       <a class="btn" href="https://wa.me/{{ whatsapp_e164 }}?text=Hi%20Wjm%2C%20I%20need%20assistance%20please."
          target="_blank" rel="noopener">WhatsApp</a>
@@ -911,10 +911,52 @@ const url = window.location.href;
   }
 </script>
 
+<!-- Share Options Modal -->
+<div id="shareOptionsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="shareOptionsTitle">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="shareOptionsTitle">Share Contact</h2>
+      <button onclick="closeShareOptions()" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <p class="note" style="margin-top:0;">
+        Choose how you want to share your details.
+      </p>
+      <a class="btn" onclick="shareViaNFC()">Share via NFC</a>
+      <div style="height:12px;"></div>
+      <a class="btn" onclick="shareContactFile()">Share Contact File</a>
+    </div>
+  </div>
+</div>
+
+
+
 <script>
-  // Share the vCard (.vcf) contact file via the native share sheet (iOS/Android).
-  // Falls back to downloading/opening the VCF if file-sharing isn't supported.
-  async function shareContact(){
+  function openShareOptions(){
+    const m = document.getElementById("shareOptionsModal");
+    if(!m) return;
+    m.style.display = "block";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeShareOptions(){
+    const m = document.getElementById("shareOptionsModal");
+    if(!m) return;
+    m.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  // Option 1: "Share via NFC"
+  // Note: phones can't transmit NFC programmatically; this opens your NFC flow/URL.
+  function shareViaNFC(){
+    closeShareOptions();
+    window.location.href = "{{ url_for('go_nfc', slug=slug) }}";
+  }
+
+  // Option 2: share the actual vCard (.vcf) file
+  async function shareContactFile(){
+    closeShareOptions();
+
     const vcfUrl = "{{ url_for('vcard_slug', slug=slug) }}";
     const fileName = "{{ slug }}.vcf";
 
@@ -932,8 +974,20 @@ const url = window.location.href;
       }
     }catch(e){}
 
+    // Fallback: open/download the VCF
     window.location.href = vcfUrl;
   }
+
+  // Close the modal on outside click + ESC (reuse existing patterns)
+  window.addEventListener('click', function(e){
+    const m = document.getElementById('shareOptionsModal');
+    if(m && e.target === m){ closeShareOptions(); }
+  });
+  window.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    const m = document.getElementById('shareOptionsModal');
+    if(m && m.style.display === 'block'){ closeShareOptions(); }
+  });
 </script>
 
 </body>
