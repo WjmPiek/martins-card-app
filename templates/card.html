@@ -927,17 +927,11 @@ const url = window.location.href;
       const file = new File([blob], fileName, { type: "text/vcard" });
 
       if(navigator.canShare && navigator.canShare({ files: [file] })){
-        await navigator.share({
-          title: "{{ display_name }}",
-          files: [file]
-        });
+        await navigator.share({ title: "{{ display_name }}", files: [file] });
         return;
       }
-    }catch(e){
-      // ignore and fall back
-    }
+    }catch(e){}
 
-    // Fallback: open/download the VCF
     window.location.href = vcfUrl;
   }
 </script>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Add Contact • {{ display_name }}</title>
+  <style>
+    :root{
+      --bg:#F5F6FA; --bg2:#E5E7EB; --card:#fff; --line:#E5E7EB;
+      --text:#2E2E2E; --muted:#6B7280; --btn:#6A1B9A; --btnHover:#4A148C;
+      --shadow:0 18px 45px rgba(17,24,39,0.10); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:linear-gradient(135deg,var(--bg),var(--bg2));
+      color:var(--text); padding:20px;
+    }
+    .card{
+      width:min(460px,100%);
+      border-radius:var(--radius);
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      padding:22px;
+      text-align:center;
+    }
+    h1{margin:0 0 8px; font-size:20px; font-weight:900;}
+    p{margin:0 0 14px; color:var(--muted); line-height:1.55; font-size:14px;}
+    .btn{
+      display:block; width:100%;
+      text-align:center; padding:14px;
+      border-radius:14px; text-decoration:none;
+      font-weight:800; background:var(--btn); color:#fff;
+      border:1px solid rgba(74,20,140,0.18);
+      transition:.18s ease;
+    }
+    .btn:hover{background:var(--btnHover); transform:translateY(-1px);}
+    .link{
+      display:inline-block; margin-top:12px;
+      color:var(--btn); text-decoration:none; font-weight:800; font-size:14px;
+    }
+    .small{font-size:12px; margin-top:10px; color:rgba(17,24,39,0.55);}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Save {{ display_name }} to Contacts</h1>
+    <p>
+      Your contact card will open now. After you tap <strong>Done</strong>,
+      you'll be taken to the full profile page automatically.
+    </p>
+
+    <a id="addBtn" class="btn" href="{{ url_for('vcard_slug', slug=slug) }}">Add Contact</a>
+
+    <a class="link" href="{{ url_for('card', slug=slug) }}">Open Profile</a>
+    <div class="small">Tip: If the contact screen doesn't open, tap “Add Contact”.</div>
+  </div>
+
+  <script>
+    // We can't force a redirect from the iOS contact viewer.
+    // But we *can* detect when the user returns to this page (via Back),
+    // and then redirect to the profile.
+    const KEY = "nfc_add_started_{{ slug }}";
+
+    // If they've already opened the vCard once and returned, redirect now.
+    if(localStorage.getItem(KEY) === "1"){
+      localStorage.removeItem(KEY);
+      window.location.replace("{{ url_for('card', slug=slug) }}");
+    }else{
+      // First visit: mark and auto-open the vCard once.
+      localStorage.setItem(KEY, "1");
+      setTimeout(()=>{ document.getElementById("addBtn").click(); }, 250);
+    }
+  </script>
+</body>
+</html>
